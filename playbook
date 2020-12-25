@@ -1,0 +1,54 @@
+---
+ - name: try http_secure_webpage
+   hosts: myserver
+   become: true
+   ignore_errors: yes
+   tasks:
+     - name: intsall httpd package
+       yum:
+         name: httpd
+         state: present
+
+     - name: httpd service start
+       service:
+         name: httpd
+         state: started
+         enabled: yes
+
+     - name: write html file
+       copy:
+         content: "{{ ansible_nodename }}"
+         dest: /var/www/html/index.html
+
+     - name: configure firewalld
+       firewalld:
+         port: 80/tcp
+         state: enabled
+         permanent: yes
+         immediate: yes
+
+     - name: edit httpd.conf
+       replace:
+         path: /etc/httpd/conf/httpd.conf
+         before: "    Require all granted"
+         regexp: "    AllowOverride None"
+         replace: "    AllowOverride AuthConfig"
+
+     - name: htpasswd
+       htpasswd:
+         name: user
+         password: password
+         crypt_scheme: md5_crypt
+         state: present
+         path: /var/www/html/.htpasswd
+         create: yes
+
+     - name: htaccess
+       copy:
+         src: sample.txt
+         dest: /var/www/html/.htaccess
+
+     - name: service start
+       service:
+         name: httpd
+         state: restarted
