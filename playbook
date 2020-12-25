@@ -36,7 +36,7 @@
 
      - name: htpasswd
        htpasswd:
-         name: user
+         name: username
          password: password
          crypt_scheme: md5_crypt
          state: present
