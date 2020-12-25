@@ -1,4 +1,4 @@
-# /bash/bin
+# /bin/bash
 
 sudo yum install epel-release
 sudo yum config-manager --set-enabled PowerTools
